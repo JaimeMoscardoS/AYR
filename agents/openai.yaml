@@ -1,0 +1,4 @@
+interface:
+  display_name: "AYR (Arquitect Your Repository)"
+  short_description: "Prepare your repository, skills and agent workflow"
+  default_prompt: "Use $ayr to clarify my project and prepare its repository."
