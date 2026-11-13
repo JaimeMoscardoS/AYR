@@ -1,149 +1,140 @@
-# AYR (Arquitect Your Repository)
+# AYR
 
-## What it is
+### Arquitect Your Repository
 
-A portable skill that prepares software repositories for humans, Claude Code, and Codex: discover useful capabilities, choose a proportionate structure, coordinate responsibilities, and leave reproducible verification and continuation notes.
+[![Checks](https://github.com/JaimeMoscardoS/AYR/actions/workflows/validate.yml/badge.svg)](https://github.com/JaimeMoscardoS/AYR/actions/workflows/validate.yml)
+[![Version](https://img.shields.io/badge/version-0.1.0--beta-blue)](https://github.com/JaimeMoscardoS/AYR/releases/tag/v0.1.0-beta)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**v0.1.0-beta · MIT licensed.** An early public release for real-project feedback. See [beta scope and validation](docs/releases/v0.1.0-beta.md) for tested behavior and remaining limits.
+**Turn a project idea into a repository you can understand, build and continue.**
 
-Installation mechanics are tested on Windows PowerShell and Linux Bash. An in-session agent demonstration completed AYR's interview-to-working-CLI flow using a fictional client. Standalone client probes and AYR-to-GSD handoffs remain experimental: release-time CLI runs were blocked by usage limits or execution policy before instructions could be loaded. See the evaluation record for the distinct scopes of those checks.
+AYR is a workflow skill for Claude Code and Codex. It starts by asking about your project, chooses useful skills and agent responsibilities, and prepares a structure that fits the work. When you ask for implementation, it continues toward a first working flow with checks.
 
-## Use
+[Install](docs/installation.md) · [Examples](#examples) · [How it works](#how-it-works) · [GSD integration](#working-with-gsd) · [Beta evidence](docs/evaluation.md)
 
-Ask the assistant to use ayr, for example:
+> **Public beta:** real Windows/Linux installation checks and a complete small-project demonstration are recorded. Standalone client workflows and the live GSD handoff still have unverified paths. Read [what is tested](#what-is-tested) before relying on those integrations.
 
-> Use ayr to prepare a small Python API in this repository. Preserve existing work, evaluate useful agents/skills, and document how to run and verify it.
+## What it helps with
 
-The workflow starts with a short project interview before changing files or choosing the architecture and agent team. It asks up to three questions per round about the product, users, first working outcome and relevant constraints, reuses information already provided, and waits for answers to dependent decisions. You can explicitly ask it to skip the interview and proceed with stated assumptions. A complete brief avoids repeated questions.
+- **Starting with an unclear idea:** clarify users, the first useful outcome and the constraints before choosing a stack.
+- **Preparing a repository for AI-assisted work:** document boundaries, commands, verification and continuation for both assistants.
+- **Choosing capabilities:** reuse installed skills, inspect missing capabilities and bring in specialists only for actual tasks.
+- **Keeping work coordinated:** assign ownership, respect dependencies and retain one workflow owner and one project state.
 
-The portable skill ID is `ayr`; the visible name is **AYR (Arquitect Your Repository)**. Claude discovers the skill as `/ayr` and Codex supports `$ayr` or a natural-language request. The included `commands/AYR.md` adapter provides the uppercase command name for clients supporting custom slash commands. The skill itself requires no GitHub CLI, Node, RAG service, fixed agent catalog, or particular operating system. Optional discovery/integrations use tools actually available.
+A small CLI can stay a script and tests. A larger application can use component boundaries and an existing planning workflow. AYR does not require a monorepo, a fixed team, a RAG service or a subscription beyond whatever your chosen coding client needs.
 
-## Install for Claude Code and Codex
+## Get started
 
-The examples use one canonical clone in `~/.agents/skills/ayr` and a link in `~/.claude/skills/ayr`. Both destinations must be absent; existing installations are never overwritten. Git is required. Use Bash on Linux/macOS and PowerShell on Windows; Git Bash on Windows is not the supported symlink installation route.
+1. [Install AYR](docs/installation.md) using PowerShell on Windows or Bash on Linux. The guide stages the source for review before activating it and avoids overwriting an existing installation.
+2. Open **the project you want to work on** in your coding client. The skill installation folder is not your project.
+3. Invoke the skill with your request.
 
-Stage the clone outside skill discovery, record its exact commit SHA, and review its instructions and referenced files before activating it. The commands detach at that captured revision and verify it again before activation. For a previously reviewed release, use its exact commit instead. Run staging and activation in the same terminal.
+| Client | Invocation |
+| --- | --- |
+| Claude Code | `/ayr`, or `/AYR` after installing the included command adapter |
+| Codex | `$ayr`, or “Use AYR…”; uppercase custom-command presentation depends on the client |
 
-### Bash: stage and review
+The portable skill ID is `ayr`. Its visible name is **AYR (Arquitect Your Repository)**. The [command adapter](commands/AYR.md) and [installation guide](docs/installation.md) explain the uppercase alias.
 
-```bash
-ayr_prepare() {
-  ayr_revision=''
-  ayr_stage="$(mktemp -d "${TMPDIR:-/tmp}/ayr.XXXXXX")" || return 1
-  git clone https://github.com/JaimeMoscardoS/AYR.git "$ayr_stage" || return 1
-  ayr_revision="$(git -C "$ayr_stage" rev-parse HEAD)" || return 1
-  [[ "$ayr_revision" =~ ^[0-9a-f]{40,64}$ ]] || return 1
-  git -C "$ayr_stage" checkout --detach "$ayr_revision" || return 1
-  test -f "$ayr_stage/SKILL.md" || return 1
-  git -C "$ayr_stage" ls-tree -r --name-only HEAD || return 1
-  cat "$ayr_stage/SKILL.md"
-}
-ayr_prepare
+Prefer an archive? [Download the beta ZIP](https://github.com/JaimeMoscardoS/AYR/releases/download/v0.1.0-beta/AYR-v0.1.0-beta.zip), inspect it and follow the client directory guidance in the installation guide. It contains an `ayr/` folder, not a dependency installer.
+
+## Examples
+
+**Explore an idea**
+
+> Use AYR to help me start a local reading tracker. Ask about the first useful workflow before choosing the implementation.
+
+**Build a first working flow**
+
+> Use AYR to create a small Python API. It needs one authenticated endpoint and tests. Preserve the existing project conventions and implement the first working flow.
+
+**Prepare without implementing**
+
+> Use AYR to prepare this repository for Claude Code and Codex. Document the architecture and run/test commands, select relevant skills and leave a clear next task. Do not implement application features.
+
+**Continue a project that already uses GSD**
+
+> Use AYR to inspect this project's capabilities. Preserve the existing GSD requirements, roadmap and checkpoints, and route the next work through that workflow.
+
+The interview asks up to three focused questions per round, reuses answers already given and waits before decisions that depend on your response. “No preference” delegates that particular choice; “I don't know” leads to a recommendation rather than a silent assumption. You can explicitly ask to skip questions and proceed with stated assumptions.
+
+## How it works
+
+```text
+Understand the project
+        |
+Select the capabilities it needs
+        |
+Prepare boundaries, ownership and structure
+        |
+Build the authorized first flow or hand off to the chosen workflow
+        |
+Verify, report limits and leave a continuation
 ```
 
-Review the listed references and any executable resources as data. After accepting that revision, activate it:
+AYR reads relevant project context and optional knowledge sources, checks the actual repository and selects only the instructions needed for the next step. It records recommendations separately from capabilities that are really activated.
 
-```bash
-ayr_activate() {
-  [[ "${ayr_revision:-}" =~ ^[0-9a-f]{40,64}$ ]] || { printf '%s\n' 'No valid reviewed revision.' >&2; return 1; }
-  test -n "${ayr_stage:-}" && test -f "$ayr_stage/SKILL.md" || return 1
-  ayr_actual="$(git -C "$ayr_stage" rev-parse HEAD)" || return 1
-  test "$ayr_actual" = "$ayr_revision" || return 1
-  ayr_changes="$(git -C "$ayr_stage" status --porcelain --untracked-files=all --ignored)" || return 1
-  test -z "$ayr_changes" || { printf '%s\n' 'Staging changed; review a clean checkout before activation.' >&2; return 1; }
-  ayr_canonical="$HOME/.agents/skills/ayr"
-  ayr_claude="$HOME/.claude/skills/ayr"
-  if [ -e "$ayr_canonical" ] || [ -L "$ayr_canonical" ] ||
-     [ -e "$ayr_claude" ] || [ -L "$ayr_claude" ]; then
-    printf '%s\n' 'An installation already exists; review it separately.' >&2
-    return 1
-  fi
-  mkdir -p "$HOME/.agents/skills" "$HOME/.claude/skills" || return 1
-  mv "$ayr_stage" "$ayr_canonical" || return 1
-  ln -s "$ayr_canonical" "$ayr_claude"
-}
-ayr_activate
+**Typical outputs:** a useful README; consistent `AGENTS.md` and `CLAUDE.md`; code and tests when requested; a short record of selected capabilities; and observed check results with outstanding work. Existing documents are reused. Architecture decisions, contracts, CI and planning are added when the project needs them.
+
+## Working with GSD
+
+[GSD](https://github.com/open-gsd/gsd-core) is an optional workflow for planning, executing and verifying projects in phases, with persistent project state. Its active public home is GSD Core; AYR's named routes are examples from inspected installed skills, so command and resource compatibility must be checked for your package version. GSD is not bundled here.
+
+AYR can select existing skills for design, research, debugging, review and verification. They remain separate, optional capabilities: AYR does not bundle their code or install a whole collection.
+
+When GSD already owns a project, its requirements, roadmap, state and checkpoints remain authoritative. AYR uses its progress/resume routing and hands over the brief and accepted decisions. It does not create a second roadmap or launch a competing director. New substantial work may benefit from GSD; small tasks can use a lighter path.
+
+A listed skill is not necessarily ready. AYR checks its entry point, referenced resources and runtime support. A missing resource becomes a named blocker, not a fabricated successful handoff.
+
+See [the routing guide](references/skill-routing.md) and [coordination rules](references/coordination.md). The live AYR-to-GSD handoff is **experimental and not yet verified**.
+
+## What is tested
+
+| Evidence | Observed result | Scope |
+| --- | --- | --- |
+| Package CI | Passes on Windows and Linux | Discovery fields, local links and selected portability/token patterns |
+| Native installation | Four scenarios pass per OS | Real local Git clone/checkout and junction/symlink; existing install, modified staging and empty SHA are rejected |
+| Small-project demonstration | Interview followed by a working reading-list CLI | Native agent session, fictional client, standard-library Python |
+| Demo verification | 10 application tests and 14 independent CLI invocations | Persistence, Unicode, stable IDs, idempotence and preserving data on invalid inputs |
+| Standalone client probes | Blocked by quota or execution policy | Not counted as successful end-to-end runs |
+| Live GSD handoff | Pending | State was preserved in the blocked attempt; no completed handoff is claimed |
+
+The installation suite redirects the clone URL to a local Git fixture; it tests actual filesystem mechanics, not anonymous access to GitHub. macOS installation is not tested by this release. The demo does not establish reliability for larger projects.
+
+Read the [evaluation record](docs/evaluation.md) and [release notes](docs/releases/v0.1.0-beta.md) for the evidence and limits.
+
+## Trust and permissions
+
+Skills can influence an assistant's actions. Review AYR and any capability it proposes before loading or executing them. AYR asks for source/revision, license, permissions, executable resources and network/data access to be assessed. Stars and install counts are not security guarantees.
+
+AYR is **not a sandbox or security scanner**. Its instructions cannot enforce isolation or override your client's permissions. Repository creation, publication and deployment remain within the scope you authorize. Private project information belongs inside its authorized boundary.
+
+See [discovery and trust](references/discovery.md) and [security reporting](SECURITY.md).
+
+## Inside the repository
+
+| Path | Purpose |
+| --- | --- |
+| [SKILL.md](SKILL.md) | Main workflow loaded by the assistant |
+| [references/](references/skill-routing.md) | Conditional routing, coordination, structure and trust guidance |
+| [commands/AYR.md](commands/AYR.md) | Optional uppercase command adapter |
+| [agents/openai.yaml](agents/openai.yaml) | Display metadata; not a runtime agent definition |
+| [templates/bootstrap-record.md](templates/bootstrap-record.md) | Optional output contract |
+| [docs/](docs/source-analysis.md) | Installation, design rationale, source analysis and evaluation |
+| [tests/](tests/test_package.py) | Package checks and isolated installation tests |
+
+The [public repository analysis](docs/public-reference-analysis.md) explains patterns from VS Code, uv, Django and FastAPI, with immutable source links and limits on what to copy.
+
+## Contribute
+
+For a bug report, include your OS, client/version, the request, expected behavior and the observed result. Use a minimal non-sensitive reproduction. For a workflow improvement, explain the concrete failure it solves and how to verify the change.
+
+Run the checks with Python 3.11+ and Git:
+
+```sh
+python -m unittest discover -s tests -v
 ```
 
-### PowerShell: stage and review
+Use your installed launcher (`python3`, `py -3` or an explicit executable) if `python` is absent from PATH. Each OS intentionally skips the other platform's four installation cases.
 
-```powershell
-$ayrRevision = $null
-$ayrStage = Join-Path ([IO.Path]::GetTempPath()) ('ayr-' + [guid]::NewGuid().ToString('N'))
-git clone https://github.com/JaimeMoscardoS/AYR.git $ayrStage
-if ($LASTEXITCODE -ne 0) { throw 'Clone failed.' }
-$ayrRevision = git -C $ayrStage rev-parse HEAD
-if ($LASTEXITCODE -ne 0) { throw 'Cannot resolve revision.' }
-if ($ayrRevision -notmatch '^[0-9a-f]{40,64}$') { throw 'Invalid revision.' }
-git -C $ayrStage checkout --detach $ayrRevision
-if ($LASTEXITCODE -ne 0) { throw 'Revision checkout failed.' }
-git -C $ayrStage ls-tree -r --name-only HEAD
-Get-Content -Encoding utf8 -LiteralPath (Join-Path $ayrStage 'SKILL.md')
-```
-
-Review the listed resources before running the activation block. Windows uses a directory junction, which does not require enabling symbolic links:
-
-```powershell
-$ayrCanonical = [IO.Path]::GetFullPath((Join-Path $HOME '.agents/skills/ayr'))
-$ayrClaude = [IO.Path]::GetFullPath((Join-Path $HOME '.claude/skills/ayr'))
-if ($ayrRevision -notmatch '^[0-9a-f]{40,64}$') { throw 'No valid reviewed revision.' }
-if (-not (Test-Path -LiteralPath (Join-Path $ayrStage 'SKILL.md') -PathType Leaf)) { throw 'Skill entry point is missing.' }
-if ((Get-Item -LiteralPath $ayrCanonical -Force -ErrorAction SilentlyContinue) -or
-    (Get-Item -LiteralPath $ayrClaude -Force -ErrorAction SilentlyContinue)) {
-    throw 'An installation already exists; review it separately.'
-}
-$ayrActual = git -C $ayrStage rev-parse HEAD
-if ($LASTEXITCODE -ne 0 -or $ayrActual -ne $ayrRevision) {
-    throw 'Staged revision does not match; activation stopped.'
-}
-$ayrChanges = git -C $ayrStage status --porcelain --untracked-files=all --ignored
-if ($LASTEXITCODE -ne 0 -or $ayrChanges) { throw 'Staging changed; review a clean checkout before activation.' }
-$ayrSource = (Resolve-Path -LiteralPath $ayrStage).Path
-if (-not $ayrSource.StartsWith([IO.Path]::GetFullPath([IO.Path]::GetTempPath()), [StringComparison]::OrdinalIgnoreCase)) {
-    throw 'Staging source must remain inside the temporary directory.'
-}
-New-Item -ItemType Directory -Force -Path (Split-Path $ayrCanonical), (Split-Path $ayrClaude) | Out-Null
-Write-Output "Moving reviewed clone from $ayrSource to $ayrCanonical"
-Move-Item -LiteralPath $ayrSource -Destination $ayrCanonical -ErrorAction Stop
-New-Item -ItemType Junction -Path $ayrClaude -Target $ayrCanonical -ErrorAction Stop | Out-Null
-```
-
-Restart or reload the clients and check that each discovers the skill. The commands install instructions only; they do not launch agents or configure additional capabilities. A client with different discovery rules may require its documented adapter.
-
-For the uppercase command, copy `commands/AYR.md` from the installed skill to `~/.claude/commands/AYR.md` and `~/.codex/prompts/AYR.md`, creating parent directories and checking that neither destination already exists. Custom-command presentation depends on the client; the portable skill invocation remains `ayr`.
-
-## Start in your target project
-
-Open the folder you want to build or prepare in your coding client, then invoke `/AYR` in Claude Code or `$ayr` in Codex with your request. The skill installation folder contains instructions; it is not the project workspace. For example, open your expense-tracker project and ask: "Use ayr to help me build a simple expense tracker. Start by asking about one useful daily workflow." The interview accepts uncertainty and helps choose proportionate defaults; a complete brief avoids repeated questions.
-
-## What the workflow produces
-
-- Project context, constraints and justified structure.
-- Consistent project instructions for both assistants.
-- A compact selection of skills and agent responsibilities with source, revision, license, permissions and review outcome.
-- Work ownership and dependencies when delegation helps.
-- Actual check results, outstanding work, and a concrete continuation.
-
-A small project stays small. Existing architecture and instructions take precedence over copying reference layouts.
-
-## How agents are organized
-
-AYR integrates existing skills by phase instead of creating its own duplicate skill family. It can select design, research, debugging, review and verification capabilities as needed. For substantial staged projects, it can hand off to GSD; an existing GSD project retains its requirements, roadmap and state. Small tasks keep a lighter route. See [existing-skill routing](references/skill-routing.md) for selection, readiness checks and handoffs. Listed skills are optional integrations, not bundled or automatically installed dependencies.
-
-One lead owns scope, integration and evidence. Explorers establish constraints; implementers own bounded files; reviewers independently check relevant risks. UI, security, data and domain specialists are selected only for concrete needs. Independent work can run in parallel with exclusive writable ownership; integration follows dependencies. A runtime without subagents executes responsibilities sequentially.
-
-See [coordination](references/coordination.md), [discovery and trust](references/discovery.md), and [repository patterns](references/repository-patterns.md). RAG is optional context retrieval, with source/freshness checks and no required provider.
-
-## Why these patterns
-
-The [design rationale](docs/source-analysis.md) explains general patterns and public references. It distinguishes source inspection from executed tests. No third-party source code or skill packages are bundled.
-
-The [large public reference analysis](docs/public-reference-analysis.md) adds VS Code, uv, Django and FastAPI with dated popularity, immutable source links, useful patterns and their limits. These are architecture and contribution references, not agents to install or layouts to copy wholesale.
-
-## Validation
-
-Run `python -m unittest discover -s tests -v` with Python 3.11+ for package integrity: skill discovery fields, local links, workstation paths and two common token patterns in Markdown. This is not a general secret scanner, third-party safety certification or proof of assistant behavior. See [behavioral evaluation](docs/evaluation.md) for scenario evidence and limits. Use your available Python launcher (`python3`, `py -3`, or an explicit executable) if `python` is absent from PATH.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). Report a reproducible issue with client version, the expected result and the observed behavior. Exclude secrets and identifying details from private projects.
+See [CONTRIBUTING.md](CONTRIBUTING.md). Contributions and reuse are covered by the [MIT license](LICENSE).

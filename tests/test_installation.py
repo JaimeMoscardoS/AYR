@@ -23,7 +23,7 @@ class DocumentedInstallation(unittest.TestCase):
         cls.git = shutil.which('git')
         if not cls.git:
             raise unittest.SkipTest('Git is required for installation fixtures')
-        readme = (ROOT / 'README.md').read_text(encoding='utf-8')
+        readme = (ROOT / 'docs' / 'installation.md').read_text(encoding='utf-8')
         cls.blocks = {}
         for language in ('bash', 'powershell'):
             blocks = re.findall(r'```' + language + r'\n(.*?)```', readme, re.S)
