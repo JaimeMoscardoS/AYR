@@ -79,4 +79,16 @@ Separate probes attempted to load the full AYR skill and start an interview in b
 
 A separate existing-GSD fixture contained project context, requirements, roadmap, state, configuration, plan and checkpoint. Claude was blocked by usage limits before reading; a read-only Codex attempt could not load AYR/GSD resources because of policy rejection. No GSD helper ran, no handoff was completed, and all seven planning files remained byte-identical. No client permissions were broadened to bypass the failures. Raw logs contain environment metadata and remain outside the release package.
 
-These external execution constraints leave full interviews and real GSD handoff validation pending. Successful installation, earlier benign discovery checks and instruction-level scenario review must not be described as substitutes for those pending tests.
+These external execution constraints leave standalone-client interviews and real GSD handoff validation pending. Successful installation, earlier benign discovery checks and instruction-level scenario review must not be described as substitutes for those pending tests.
+
+## Native-session demonstration: interview to a working application
+
+An agent in the current session loaded the actual AYR entry point and needed references using native tools. It received a vague fictional request to organize readings and returned three interview questions. Inspection confirmed the assigned empty project directory remained empty before answers. The coordinator then acted as a fictional client and selected a Python CLI with local JSON storage, add/list/done commands, stable IDs, optional author, Spanish messages and preservation of data on invalid input. These are test inputs, not personal preferences or a real client's statements.
+
+The agent produced six files: one application script, a CLI integration test module, README, equivalent project instructions for both assistants and ignore rules. No dependency, external skill package, network service, remote repository or GSD planning state was added. The selected path used AYR plus available test-first and verification instructions. It read discovery guidance without running an external search because the required capabilities were already available.
+
+The implementation's final subprocess suite passed ten tests on Python 3.14.4. The coordinator separately executed add/list/done/list on fresh synthetic data and verified failed commands for an unknown ID and corrupt JSON preserved the original bytes. The observed list output changed from pending to read without changing the ID. The demonstration remains local; its source and machine-specific logs are not bundled in this package.
+
+A separate reviewer executed fourteen real CLI invocations with temporary data outside the demo. Checks included Spanish/Japanese Unicode, optional author, stable IDs after completion and another insertion, idempotent completion, empty initial listing without file creation, invalid IDs/title, corrupt JSON and invalid schema. Error cases preserved bytes; the source remained unchanged during the check and both assistant instruction files matched. No functional defect was demonstrated within this bounded scope.
+
+This is an artifact-producing application of AYR in a native agent session. It does not turn the earlier blocked standalone CLI probes into successful tests, validate a GSD handoff, prove Python 3.11 compatibility, or establish concurrent-writer safety. The demo explicitly supports sequential use and documents these limits.

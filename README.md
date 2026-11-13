@@ -6,7 +6,7 @@ A portable skill that prepares software repositories for humans, Claude Code, an
 
 **v0.1.0-beta · MIT licensed.** An early public release for real-project feedback. See [beta scope and validation](docs/releases/v0.1.0-beta.md) for tested behavior and remaining limits.
 
-Installation mechanics are tested on Windows PowerShell and Linux Bash. Complete AYR interviews and AYR-to-GSD handoffs remain experimental: release-time client runs were blocked by usage limits or execution policy before instructions could be loaded. See the evaluation record for the difference between successful installation and workflow validation.
+Installation mechanics are tested on Windows PowerShell and Linux Bash. An in-session agent demonstration completed AYR's interview-to-working-CLI flow using a fictional client. Standalone client probes and AYR-to-GSD handoffs remain experimental: release-time CLI runs were blocked by usage limits or execution policy before instructions could be loaded. See the evaluation record for the distinct scopes of those checks.
 
 ## Use
 
